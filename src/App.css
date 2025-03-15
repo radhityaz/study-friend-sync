@@ -1,8 +1,16 @@
+
 #root {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
   text-align: center;
+}
+
+@media (min-width: 768px) {
+  #root {
+    max-width: 1280px;
+    padding: 1rem;
+  }
 }
 
 .logo {
@@ -34,9 +42,37 @@
 }
 
 .card {
-  padding: 2em;
+  padding: 1em;
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: 2em;
+  }
 }
 
 .read-the-docs {
   color: #888;
+}
+
+/* Optimizations for Xiaomi Redmi Note 10 5G - 2400x1080, 20:9 aspect ratio */
+@media (max-width: 1080px) and (max-height: 2400px) and (aspect-ratio: 9/20) {
+  .xiaomi-redmi-note-10 {
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: var(--safe-area-inset-bottom);
+  }
+  
+  /* Adjust font sizes for better readability on narrower screens */
+  html {
+    font-size: 15px;
+  }
+  
+  /* Optimize touch targets */
+  button, 
+  [role="button"],
+  input,
+  select {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
