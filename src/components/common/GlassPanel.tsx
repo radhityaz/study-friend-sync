@@ -39,7 +39,7 @@ export function GlassPanel({
         className
       )}
       style={{
-        boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
+        boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.25)',
         WebkitBackdropFilter: intensity === 'low' ? 'blur(4px)' : intensity === 'medium' ? 'blur(8px)' : 'blur(12px)'
       }}
       {...props}

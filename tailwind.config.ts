@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -128,9 +127,9 @@ export default {
 				'spacing': 'margin, padding'
 			},
 			boxShadow: {
-				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
-				'glass-sm': '0 2px 15px rgba(0, 0, 0, 0.05)',
-				'glass-lg': '0 8px 40px rgba(0, 0, 0, 0.12)'
+				'glass': '0 4px 30px rgba(0, 0, 0, 0.2)',
+				'glass-sm': '0 2px 15px rgba(0, 0, 0, 0.1)',
+				'glass-lg': '0 8px 40px rgba(0, 0, 0, 0.25)'
 			},
 			backdropBlur: {
 				'xs': '2px'

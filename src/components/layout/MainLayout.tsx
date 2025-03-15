@@ -36,8 +36,10 @@ export function MainLayout({ children, className }: MainLayoutProps) {
             
             {/* Credits Footer */}
             <div className="mt-12 pb-4 text-center text-xs text-muted-foreground">
-              <p>Dibuat oleh Radhitya Guntoro Adhi - Teknik Industri 2023 ITB</p>
-              <p>dengan Akal Imitasi</p>
+              <p>Dibuat oleh</p>
+              <p>Radhitya Guntoro Adhi</p>
+              <p>-</p>
+              <p>Teknik Industri 2023 ITB</p>
             </div>
           </motion.main>
         </AnimatePresence>
