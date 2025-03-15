@@ -25,10 +25,10 @@ const studyData = [
 ];
 
 const pieData = [
-  { name: 'Mathematics', value: 35, color: '#3b82f6' },
-  { name: 'Physics', value: 25, color: '#10b981' },
-  { name: 'Computer Science', value: 30, color: '#f97316' },
-  { name: 'Languages', value: 10, color: '#8b5cf6' },
+  { name: 'Mathematics', value: 35, color: '#3b82f6', targetHours: 45 },
+  { name: 'Physics', value: 25, color: '#10b981', targetHours: 30 },
+  { name: 'Computer Science', value: 30, color: '#f97316', targetHours: 25 },
+  { name: 'Languages', value: 10, color: '#8b5cf6', targetHours: 15 },
 ];
 
 const upcomingTasks = [
@@ -44,6 +44,19 @@ export function Dashboard() {
   const averageHours = totalStudyHours / studyData.length;
   const targetHours = 25; // Weekly target
   const progressPercentage = Math.round((totalStudyHours / targetHours) * 100);
+  
+  // Determine motivational message based on daily average
+  const getMotivationalMessage = () => {
+    const dailyTarget = targetHours / 7; // Daily target hours
+    
+    if (averageHours < dailyTarget * 0.8) {
+      return "Anda kurang dari target, Push Harder, Mate! 🔥";
+    } else if (averageHours > dailyTarget * 1.2) {
+      return "Wow, Anda melampaui target, Santai Dulu Gak Sih..🛀";
+    } else {
+      return "Anda sesuai target, Keep It On Track, Mate! 🍃";
+    }
+  };
   
   return (
     <div className="space-y-6">
@@ -99,8 +112,11 @@ export function Dashboard() {
           </div>
           <div className="mt-auto">
             <span className="text-2xl font-bold">{averageHours.toFixed(1)}h</span>
-            <div className="text-xs text-muted-foreground mt-1">
-              per day
+            <div className="flex flex-col">
+              <div className="text-xs text-muted-foreground mt-1">per day</div>
+              <div className="text-xs font-medium mt-1" style={{ color: averageHours < targetHours/7 * 0.8 ? '#f97316' : averageHours > targetHours/7 * 1.2 ? '#8b5cf6' : '#10b981' }}>
+                {getMotivationalMessage()}
+              </div>
             </div>
           </div>
         </AnimatedCard>
@@ -212,9 +228,10 @@ export function Dashboard() {
                   outerRadius={80}
                   paddingAngle={2}
                   dataKey="value"
+                  className="drop-shadow-xl"
                 >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    <Cell key={`cell-${index}`} fill={entry.color} className="drop-shadow-lg" />
                   ))}
                 </Pie>
                 <Tooltip
@@ -222,9 +239,15 @@ export function Dashboard() {
                     background: 'rgba(255, 255, 255, 0.95)', 
                     border: 'none', 
                     borderRadius: '8px',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+                    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
                   }}
-                  formatter={(value) => [`${value}%`, 'Portion']}
+                  formatter={(value, name, props) => {
+                    const entry = pieData.find(item => item.name === name);
+                    return [
+                      `${value}% (${entry?.targetHours}h target)`, 
+                      name
+                    ];
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -232,12 +255,15 @@ export function Dashboard() {
           
           <div className="grid grid-cols-2 gap-2">
             {pieData.map((subject) => (
-              <div key={subject.name} className="flex items-center text-xs">
+              <div key={subject.name} className="flex items-center text-xs p-2 rounded-md transition-all hover:bg-black/5">
                 <div 
-                  className="h-3 w-3 rounded-full mr-2" 
+                  className="h-3 w-3 rounded-full mr-2 shadow-sm" 
                   style={{ backgroundColor: subject.color }}
                 />
-                <span className="truncate">{subject.name}</span>
+                <div className="flex flex-col">
+                  <span className="truncate font-medium">{subject.name}</span>
+                  <span className="text-muted-foreground text-[10px]">{subject.targetHours}h target</span>
+                </div>
               </div>
             ))}
           </div>

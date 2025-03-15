@@ -107,18 +107,29 @@
 @layer components {
   .glass {
     @apply bg-white/50 backdrop-blur-lg border border-white/20 shadow-glass;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
   }
   
   .glass-dark {
     @apply bg-black/30 backdrop-blur-lg border border-white/10 shadow-glass;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
   }
   
   .glass-card {
     @apply bg-white/80 backdrop-blur-md border border-white/30 shadow-glass-sm transition-all hover:shadow-glass;
+    box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.1);
   }
   
   .glass-panel {
     @apply bg-white/90 backdrop-blur-md border border-white/40 shadow-glass;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  }
+  
+  .modern-glass {
+    @apply bg-gradient-to-br from-white/80 to-white/40 backdrop-blur-xl border border-white/30;
+    box-shadow: 
+      0 8px 32px 0 rgba(31, 38, 135, 0.15),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.2);
   }
 }
 
