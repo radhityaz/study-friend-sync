@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Logo } from '../common/Logo';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -32,6 +33,10 @@ export function MainLayout({ children, className }: MainLayoutProps) {
               className
             )}
           >
+            <div className="mb-6 flex justify-center md:justify-start">
+              <Logo size="lg" />
+            </div>
+            
             {children}
             
             {/* Credits Footer */}

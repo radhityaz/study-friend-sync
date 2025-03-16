@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AnimatedCard } from '../common/AnimatedCard';
 import { Task, TaskItem } from './TaskItem';
@@ -56,7 +55,7 @@ const mockTasks: Task[] = [
   }
 ];
 
-export function TaskList() {
+export default function TaskList() {
   const [tasks, setTasks] = React.useState<Task[]>(mockTasks);
   const [filter, setFilter] = React.useState<'all' | 'pending' | 'completed'>('all');
   const [search, setSearch] = React.useState('');
