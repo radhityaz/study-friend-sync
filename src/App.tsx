@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { Suspense, lazy } from "react";
 import { LoadingSpinner } from "./components/common/LoadingSpinner";
+import { AuthProvider, RequireAuth } from "./hooks/useAuth";
 
 // Add framer-motion for smooth page transitions
 import { MotionConfig } from "framer-motion";
@@ -18,6 +19,7 @@ const Timer = lazy(() => import("./pages/Timer"));
 const Notes = lazy(() => import("./pages/Notes"));
 const Calendar = lazy(() => import("./pages/Calendar"));
 const Settings = lazy(() => import("./pages/Settings"));
+const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -29,20 +31,23 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Suspense fallback={<LoadingSpinner fullScreen size="lg" message="Loading Jadwalinæ..." />}>
-            <AnimatePresence mode="wait">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/tasks" element={<Tasks />} />
-                <Route path="/timer" element={<Timer />} />
-                <Route path="/notes" element={<Notes />} />
-                <Route path="/calendar" element={<Calendar />} />
-                <Route path="/settings" element={<Settings />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AnimatePresence>
-          </Suspense>
+          <AuthProvider>
+            <Suspense fallback={<LoadingSpinner fullScreen size="lg" message="Loading Jadwalinæ..." />}>
+              <AnimatePresence mode="wait">
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
+                  <Route path="/tasks" element={<RequireAuth><Tasks /></RequireAuth>} />
+                  <Route path="/timer" element={<RequireAuth><Timer /></RequireAuth>} />
+                  <Route path="/notes" element={<RequireAuth><Notes /></RequireAuth>} />
+                  <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
+                  <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </AnimatePresence>
+            </Suspense>
+          </AuthProvider>
         </BrowserRouter>
       </MotionConfig>
     </TooltipProvider>

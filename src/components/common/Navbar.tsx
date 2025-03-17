@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { GlassPanel } from './GlassPanel';
-import { Home, Clipboard, Timer, FileText, Calendar, Settings, Menu, X } from 'lucide-react';
+import { Home, Clipboard, Timer, FileText, Calendar, Settings, Menu, X, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface NavItemProps {
   to: string;
@@ -38,6 +39,10 @@ function NavItem({ to, icon, label, active }: NavItemProps) {
 export function Navbar() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { signOut, user } = useAuth();
+  
+  // Don't show navbar if user is not logged in
+  if (!user) return null;
   
   const navItems = [
     { to: '/', icon: <Home size={20} />, label: 'Dashboard' },
@@ -50,6 +55,10 @@ export function Navbar() {
   
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+  
+  const handleSignOut = () => {
+    signOut();
   };
   
   return (
@@ -80,6 +89,16 @@ export function Navbar() {
                 active={location.pathname === item.to}
               />
             ))}
+            
+            <button 
+              onClick={handleSignOut}
+              className="flex items-center p-3 rounded-lg transition-smooth text-red-500 hover:bg-red-50 hover:text-red-600"
+            >
+              <div className="relative mr-3">
+                <LogOut size={20} />
+              </div>
+              <span className="text-sm font-medium">Keluar</span>
+            </button>
           </div>
         ) : null}
       </GlassPanel>

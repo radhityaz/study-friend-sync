@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Logo } from '../common/Logo';
+import { useAuth } from '@/hooks/useAuth';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ interface MainLayoutProps {
 export function MainLayout({ children, className }: MainLayoutProps) {
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { user } = useAuth();
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -33,8 +35,15 @@ export function MainLayout({ children, className }: MainLayoutProps) {
               className
             )}
           >
-            <div className="mb-6 flex justify-center md:justify-start">
+            <div className="mb-6 flex justify-between items-center">
               <Logo size="lg" />
+              
+              {user && (
+                <div className="text-sm text-muted-foreground">
+                  <span>Masuk sebagai: </span>
+                  <span className="font-medium">{user.email}</span>
+                </div>
+              )}
             </div>
             
             {children}
