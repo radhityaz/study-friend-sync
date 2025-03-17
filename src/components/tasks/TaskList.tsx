@@ -205,8 +205,8 @@ export default function TaskList({ filter = 'all' }: TaskListProps) {
             {courses.map((course) => {
               const courseTasks = tasks.filter(task => 
                 task.course === course && 
-                (filter === 'all' || (filter === 'current' && task.courseType === 'current') || 
-                (filter === 'completed' && task.courseType === 'completed'))
+                (filter === 'current' ? task.courseType === 'current' : 
+                 filter === 'completed' ? task.courseType === 'completed' : true)
               );
               
               const courseTask = courseTasks[0]; // Get the first task to extract course info
