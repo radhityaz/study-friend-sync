@@ -6,6 +6,7 @@
   text-align: center;
 }
 
+/* Responsive container adjustments */
 @media (min-width: 768px) {
   #root {
     max-width: 1280px;
@@ -13,6 +14,7 @@
   }
 }
 
+/* Logo animations and effects */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -41,6 +43,7 @@
   }
 }
 
+/* Card component responsive styles */
 .card {
   padding: 1em;
 }
@@ -55,37 +58,41 @@
   color: #888;
 }
 
-/* Optimizations for Xiaomi Redmi Note 10 5G - 2400x1080, 20:9 aspect ratio */
-@media (max-width: 1080px) and (max-height: 2400px) and (aspect-ratio: 9/20) {
-  .xiaomi-redmi-note-10 {
-    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
-    padding-bottom: calc(var(--safe-area-inset-bottom) + 70px);
-  }
-  
-  /* Adjust font sizes for better readability on narrower screens */
+/* Device optimizations - for all devices */
+.device-optimized {
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  padding-bottom: calc(var(--safe-area-inset-bottom) + 70px);
+}
+
+/* Base font size adjustments for different screen sizes */
+html {
+  font-size: 15px;
+}
+
+@media (min-width: 768px) {
   html {
-    font-size: 15px;
+    font-size: 16px;
   }
-  
-  /* Optimize touch targets */
-  button, 
-  [role="button"],
-  input,
-  select {
-    min-height: 44px;
-    min-width: 44px;
-  }
-  
-  /* Adjust navbar spacing for this specific device */
-  .navbar-container {
-    padding-bottom: env(safe-area-inset-bottom, 16px);
-  }
-  
-  /* Enhance glass-morphism effects for higher pixel density */
-  .glass-effect {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
+}
+
+/* Optimize touch targets for all mobile devices */
+button, 
+[role="button"],
+input,
+select {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Adjust navbar spacing for all devices */
+.navbar-container {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+/* Enhanced glass-morphism effects */
+.glass-effect {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* Enhanced glass-morphism effects */
