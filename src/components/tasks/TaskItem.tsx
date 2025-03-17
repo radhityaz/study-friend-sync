@@ -6,7 +6,9 @@ import {
   Calendar, 
   CheckCircle2, 
   Clock, 
-  MoreVertical 
+  MoreVertical,
+  BookOpen,
+  GraduationCap
 } from 'lucide-react';
 import { GlassPanel } from '../common/GlassPanel';
 import { motion } from 'framer-motion';
@@ -20,6 +22,10 @@ export interface Task {
   category: 'academic' | 'personal' | 'project';
   completed: boolean;
   estimatedTime?: number; // in minutes
+  course?: string; // Course name
+  courseType?: 'current' | 'completed'; // Course status
+  currentGrade?: string; // Current grade
+  expectedGrade?: string; // Expected/target grade
 }
 
 interface TaskItemProps {
@@ -53,6 +59,14 @@ export function TaskItem({ task, onToggleComplete, className, style, animationDe
       case 'academic': return 'text-blue-500 bg-blue-50';
       case 'personal': return 'text-purple-500 bg-purple-50';
       case 'project': return 'text-emerald-500 bg-emerald-50';
+      default: return 'text-gray-500 bg-gray-50';
+    }
+  };
+
+  const getCourseStatusColor = (status?: string) => {
+    switch (status) {
+      case 'current': return 'text-indigo-500 bg-indigo-50';
+      case 'completed': return 'text-teal-500 bg-teal-50';
       default: return 'text-gray-500 bg-gray-50';
     }
   };
@@ -105,6 +119,25 @@ export function TaskItem({ task, onToggleComplete, className, style, animationDe
               )}>
                 {task.category.charAt(0).toUpperCase() + task.category.slice(1)}
               </span>
+
+              {task.course && (
+                <span className={cn(
+                  "text-xs px-2 py-0.5 rounded-full font-medium",
+                  "text-blue-600 bg-blue-50"
+                )}>
+                  <BookOpen size={10} className="inline mr-1" />
+                  {task.course}
+                </span>
+              )}
+
+              {task.courseType && (
+                <span className={cn(
+                  "text-xs px-2 py-0.5 rounded-full font-medium",
+                  getCourseStatusColor(task.courseType)
+                )}>
+                  {task.courseType === 'current' ? 'Current' : 'Completed'}
+                </span>
+              )}
             </div>
             
             <h3 className={cn(
@@ -120,7 +153,7 @@ export function TaskItem({ task, onToggleComplete, className, style, animationDe
               </p>
             )}
             
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex flex-wrap items-center gap-4 mt-2">
               {formattedDate && (
                 <div className="flex items-center text-xs text-muted-foreground">
                   <Calendar size={12} className="mr-1" />
@@ -132,6 +165,17 @@ export function TaskItem({ task, onToggleComplete, className, style, animationDe
                 <div className="flex items-center text-xs text-muted-foreground">
                   <Clock size={12} className="mr-1" />
                   <span>{task.estimatedTime} min</span>
+                </div>
+              )}
+
+              {(task.currentGrade || task.expectedGrade) && (
+                <div className="flex items-center text-xs text-muted-foreground">
+                  <GraduationCap size={12} className="mr-1" />
+                  <span>
+                    {task.currentGrade && `Current: ${task.currentGrade}`}
+                    {task.currentGrade && task.expectedGrade && ' → '}
+                    {task.expectedGrade && `Target: ${task.expectedGrade}`}
+                  </span>
                 </div>
               )}
             </div>

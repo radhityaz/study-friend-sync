@@ -15,6 +15,14 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Update the form schema to match the Task type requirements
 const formSchema = z.object({
@@ -28,6 +36,10 @@ const formSchema = z.object({
   priority: z.enum(['low', 'medium', 'high']),
   category: z.enum(['academic', 'personal', 'project']),
   estimatedTime: z.coerce.number().min(0).optional(),
+  course: z.string().optional(),
+  courseType: z.enum(['current', 'completed']).optional(),
+  currentGrade: z.string().optional(),
+  expectedGrade: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -48,6 +60,10 @@ export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
       priority: initialData?.priority || 'medium',
       category: initialData?.category || 'academic',
       estimatedTime: initialData?.estimatedTime || 0,
+      course: initialData?.course || '',
+      courseType: initialData?.courseType || 'current',
+      currentGrade: initialData?.currentGrade || '',
+      expectedGrade: initialData?.expectedGrade || '',
     },
   });
 
@@ -61,8 +77,15 @@ export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
       category: data.category,
       estimatedTime: data.estimatedTime,
       completed: initialData?.completed || false,
+      course: data.course,
+      courseType: data.courseType,
+      currentGrade: data.currentGrade,
+      expectedGrade: data.expectedGrade,
     });
   };
+
+  const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "E"];
+  const showCourseFields = form.watch("category") === "academic";
 
   return (
     <Form {...form}>
@@ -138,14 +161,19 @@ export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
               <FormItem>
                 <FormLabel>Priority</FormLabel>
                 <FormControl>
-                  <select
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    {...field}
+                  <Select 
+                    value={field.value} 
+                    onValueChange={field.onChange}
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -159,20 +187,123 @@ export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
               <FormItem>
                 <FormLabel>Category</FormLabel>
                 <FormControl>
-                  <select
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    {...field}
+                  <Select 
+                    value={field.value} 
+                    onValueChange={field.onChange}
                   >
-                    <option value="academic">Academic</option>
-                    <option value="personal">Personal</option>
-                    <option value="project">Project</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="academic">Academic</SelectItem>
+                      <SelectItem value="personal">Personal</SelectItem>
+                      <SelectItem value="project">Project</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
+
+        {showCourseFields && (
+          <>
+            <FormField
+              control={form.control}
+              name="course"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Course</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Course name" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="courseType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Course Status</FormLabel>
+                  <FormControl>
+                    <Select 
+                      value={field.value} 
+                      onValueChange={field.onChange}
+                      defaultValue="current"
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="current">Currently Taking</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="currentGrade"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Current Grade</FormLabel>
+                    <FormControl>
+                      <Select 
+                        value={field.value || ''} 
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select grade" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {gradeOptions.map(grade => (
+                            <SelectItem key={grade} value={grade}>{grade}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="expectedGrade"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Expected/Target Grade</FormLabel>
+                    <FormControl>
+                      <Select 
+                        value={field.value || ''} 
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select target" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {gradeOptions.map(grade => (
+                            <SelectItem key={grade} value={grade}>{grade}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </>
+        )}
 
         <div className="flex justify-end gap-2 pt-2">
           <Button type="button" variant="outline" onClick={onCancel}>

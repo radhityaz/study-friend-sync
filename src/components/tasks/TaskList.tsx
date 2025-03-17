@@ -2,12 +2,12 @@
 import React from 'react';
 import { AnimatedCard } from '../common/AnimatedCard';
 import { Task, TaskItem } from './TaskItem';
-import { PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search, BookOpen, GraduationCap } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { TaskForm } from './TaskForm';
 import { useToast } from '@/components/ui/use-toast';
 
-// Mock data
+// Mock data with course information
 const mockTasks: Task[] = [
   {
     id: '1',
@@ -17,7 +17,11 @@ const mockTasks: Task[] = [
     priority: 'high',
     category: 'academic',
     completed: false,
-    estimatedTime: 120
+    estimatedTime: 120,
+    course: 'Calculus II',
+    courseType: 'current',
+    currentGrade: 'B+',
+    expectedGrade: 'A-'
   },
   {
     id: '2',
@@ -27,7 +31,11 @@ const mockTasks: Task[] = [
     priority: 'medium',
     category: 'academic',
     completed: false,
-    estimatedTime: 90
+    estimatedTime: 90,
+    course: 'Physics I',
+    courseType: 'current',
+    currentGrade: 'B',
+    expectedGrade: 'A'
   },
   {
     id: '3',
@@ -37,7 +45,11 @@ const mockTasks: Task[] = [
     priority: 'high',
     category: 'academic',
     completed: false,
-    estimatedTime: 180
+    estimatedTime: 180,
+    course: 'Data Structures',
+    courseType: 'current',
+    currentGrade: 'A-',
+    expectedGrade: 'A'
   },
   {
     id: '4',
@@ -51,17 +63,39 @@ const mockTasks: Task[] = [
   },
   {
     id: '5',
-    title: 'Schedule Study Group Meeting',
+    title: 'Finalize Linear Algebra Notes',
+    description: 'Organize notes from the whole semester',
+    priority: 'medium',
+    category: 'academic',
+    completed: true,
+    dueDate: '2024-04-20',
+    course: 'Linear Algebra',
+    courseType: 'completed',
+    currentGrade: 'A',
+    expectedGrade: 'A'
+  },
+  {
+    id: '6',
+    title: 'Review Statistics Final Exam',
+    description: 'Check all answers and document mistakes',
     priority: 'low',
-    category: 'personal',
-    completed: false,
-    dueDate: '2024-05-14'
+    category: 'academic',
+    completed: true,
+    dueDate: '2024-04-10',
+    course: 'Statistics',
+    courseType: 'completed',
+    currentGrade: 'B+',
+    expectedGrade: 'B+'
   }
 ];
 
-export default function TaskList() {
+interface TaskListProps {
+  filter?: 'all' | 'current' | 'completed';
+}
+
+export default function TaskList({ filter = 'all' }: TaskListProps) {
   const [tasks, setTasks] = React.useState<Task[]>(mockTasks);
-  const [filter, setFilter] = React.useState<'all' | 'pending' | 'completed'>('all');
+  const [taskFilter, setTaskFilter] = React.useState<'all' | 'pending' | 'completed'>('all');
   const [search, setSearch] = React.useState('');
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const { toast } = useToast();
@@ -86,18 +120,33 @@ export default function TaskList() {
     });
   };
   
-  const filteredTasks = tasks
+  // Filter tasks based on course type
+  const courseFilteredTasks = tasks.filter(task => {
+    if (filter === 'current') return task.courseType === 'current';
+    if (filter === 'completed') return task.courseType === 'completed';
+    return true;
+  });
+  
+  // Further filter based on completion status and search term
+  const filteredTasks = courseFilteredTasks
     .filter(task => {
-      if (filter === 'pending') return !task.completed;
-      if (filter === 'completed') return task.completed;
+      if (taskFilter === 'pending') return !task.completed;
+      if (taskFilter === 'completed') return task.completed;
       return true;
     })
     .filter(task => 
       search ? 
         task.title.toLowerCase().includes(search.toLowerCase()) || 
-        (task.description?.toLowerCase().includes(search.toLowerCase()) ?? false)
+        (task.description?.toLowerCase().includes(search.toLowerCase()) ?? false) ||
+        (task.course?.toLowerCase().includes(search.toLowerCase()) ?? false)
       : true
     );
+  
+  // Get unique courses for the current filter
+  const courses = Array.from(new Set(courseFilteredTasks
+    .filter(task => task.course)
+    .map(task => task.course)
+  )).filter(Boolean) as string[];
   
   return (
     <div className="space-y-6">
@@ -116,8 +165,8 @@ export default function TaskList() {
         
         <div className="flex items-center space-x-2">
           <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value as 'all' | 'pending' | 'completed')}
+            value={taskFilter}
+            onChange={(e) => setTaskFilter(e.target.value as 'all' | 'pending' | 'completed')}
             className="glass border-0 py-2 focus:ring-2 focus:ring-primary/30 rounded-lg"
           >
             <option value="all">All Tasks</option>
@@ -134,6 +183,79 @@ export default function TaskList() {
           </button>
         </div>
       </div>
+      
+      {/* Course summary cards when in course view */}
+      {(filter === 'current' || filter === 'completed') && courses.length > 0 && (
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-3 flex items-center">
+            {filter === 'current' ? (
+              <>
+                <BookOpen size={18} className="mr-2 text-blue-600" />
+                Current Courses
+              </>
+            ) : (
+              <>
+                <GraduationCap size={18} className="mr-2 text-green-600" />
+                Completed Courses
+              </>
+            )}
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {courses.map((course) => {
+              const courseTasks = tasks.filter(task => 
+                task.course === course && 
+                (filter === 'all' || (filter === 'current' && task.courseType === 'current') || 
+                (filter === 'completed' && task.courseType === 'completed'))
+              );
+              
+              const courseTask = courseTasks[0]; // Get the first task to extract course info
+              
+              if (!courseTask) return null;
+              
+              return (
+                <AnimatedCard 
+                  key={course} 
+                  animation="fade"
+                  className="p-4 h-full flex flex-col"
+                >
+                  <h3 className="font-medium text-lg mb-1">{course}</h3>
+                  
+                  {courseTask.currentGrade && courseTask.expectedGrade && (
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-sm">
+                        Grade: <span className="font-medium">{courseTask.currentGrade}</span>
+                        {" → "}
+                        <span className="font-medium">{courseTask.expectedGrade}</span>
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="text-sm text-muted-foreground">
+                    <span className="block">
+                      {courseTasks.filter(t => !t.completed).length} pending tasks
+                    </span>
+                    <span className="block">
+                      {courseTasks.filter(t => t.completed).length} completed tasks
+                    </span>
+                  </div>
+                  
+                  {filter === 'current' && courseTask.currentGrade && courseTask.expectedGrade && (
+                    <div className="mt-3 text-xs">
+                      <h4 className="font-medium text-sm mb-1">Study Recommendation</h4>
+                      <p className="text-muted-foreground">
+                        {courseTask.currentGrade !== courseTask.expectedGrade
+                          ? `Focus on this course to improve from ${courseTask.currentGrade} to ${courseTask.expectedGrade}. Schedule regular study sessions.`
+                          : "You're on track to meet your target grade."}
+                      </p>
+                    </div>
+                  )}
+                </AnimatedCard>
+              );
+            })}
+          </div>
+        </div>
+      )}
       
       {/* Task list */}
       <div className="space-y-3">
@@ -163,7 +285,7 @@ export default function TaskList() {
 
       {/* Create task dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Create New Task</DialogTitle>
           </DialogHeader>
