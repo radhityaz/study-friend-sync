@@ -17,6 +17,7 @@ const Tasks = lazy(() => import("./pages/Tasks"));
 const Timer = lazy(() => import("./pages/Timer"));
 const Notes = lazy(() => import("./pages/Notes"));
 const Calendar = lazy(() => import("./pages/Calendar"));
+const Settings = lazy(() => import("./pages/Settings"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -36,6 +37,7 @@ const App = () => (
                 <Route path="/timer" element={<Timer />} />
                 <Route path="/notes" element={<Notes />} />
                 <Route path="/calendar" element={<Calendar />} />
+                <Route path="/settings" element={<Settings />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

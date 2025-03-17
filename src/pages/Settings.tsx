@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { SKSInput } from '@/components/settings/SKSInput'; // Import the SKSInput component
 
 const Settings = () => {
   const isMobile = useIsMobile();
@@ -208,6 +209,9 @@ const Settings = () => {
               </div>
             </div>
           </AnimatedCard>
+          
+          {/* SKS Input - Add the new component here */}
+          <SKSInput />
           
           {/* Security & Privacy */}
           <AnimatedCard
