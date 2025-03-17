@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
+// Update the form schema to match the Task type requirements
 const formSchema = z.object({
   title: z.string().min(2, {
     message: 'Title must be at least 2 characters.',
@@ -29,6 +30,8 @@ const formSchema = z.object({
   estimatedTime: z.coerce.number().min(0).optional(),
 });
 
+type FormValues = z.infer<typeof formSchema>;
+
 interface TaskFormProps {
   onSubmit: (data: Omit<Task, 'id'>) => void;
   onCancel: () => void;
@@ -36,7 +39,7 @@ interface TaskFormProps {
 }
 
 export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: initialData?.title || '',
@@ -48,9 +51,15 @@ export function TaskForm({ onSubmit, onCancel, initialData }: TaskFormProps) {
     },
   });
 
-  const handleSubmit = (data: z.infer<typeof formSchema>) => {
+  const handleSubmit = (data: FormValues) => {
+    // Ensure all required properties are included
     onSubmit({
-      ...data,
+      title: data.title,
+      description: data.description,
+      dueDate: data.dueDate,
+      priority: data.priority,
+      category: data.category,
+      estimatedTime: data.estimatedTime,
       completed: initialData?.completed || false,
     });
   };
