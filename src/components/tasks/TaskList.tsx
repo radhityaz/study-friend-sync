@@ -1,7 +1,11 @@
+
 import React from 'react';
 import { AnimatedCard } from '../common/AnimatedCard';
 import { Task, TaskItem } from './TaskItem';
 import { PlusCircle, Search } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { TaskForm } from './TaskForm';
+import { useToast } from '@/components/ui/use-toast';
 
 // Mock data
 const mockTasks: Task[] = [
@@ -59,11 +63,27 @@ export default function TaskList() {
   const [tasks, setTasks] = React.useState<Task[]>(mockTasks);
   const [filter, setFilter] = React.useState<'all' | 'pending' | 'completed'>('all');
   const [search, setSearch] = React.useState('');
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const { toast } = useToast();
   
   const handleToggleComplete = (id: string | number) => {
     setTasks(tasks.map(task => 
       task.id === id ? { ...task, completed: !task.completed } : task
     ));
+  };
+  
+  const handleAddTask = (task: Omit<Task, 'id'>) => {
+    const newTask: Task = {
+      ...task,
+      id: String(Date.now()), // Generate a simple id
+    };
+    
+    setTasks([newTask, ...tasks]);
+    setDialogOpen(false);
+    toast({
+      title: "Task created",
+      description: "Your new task has been added successfully.",
+    });
   };
   
   const filteredTasks = tasks
@@ -105,7 +125,10 @@ export default function TaskList() {
             <option value="completed">Completed</option>
           </select>
           
-          <button className="flex items-center gap-1 text-white bg-primary px-3 py-2 rounded-lg hover:bg-primary/90 transition-smooth">
+          <button 
+            onClick={() => setDialogOpen(true)}
+            className="flex items-center gap-1 text-white bg-primary px-3 py-2 rounded-lg hover:bg-primary/90 transition-smooth"
+          >
             <PlusCircle size={16} />
             <span className="text-sm font-medium">New Task</span>
           </button>
@@ -137,6 +160,16 @@ export default function TaskList() {
           ))
         )}
       </div>
+
+      {/* Create task dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create New Task</DialogTitle>
+          </DialogHeader>
+          <TaskForm onSubmit={handleAddTask} onCancel={() => setDialogOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
