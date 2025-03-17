@@ -26,10 +26,11 @@ interface TaskItemProps {
   task: Task;
   onToggleComplete: (id: string | number) => void;
   className?: string;
+  style?: React.CSSProperties; // Added style prop
   animationDelay?: string;
 }
 
-export function TaskItem({ task, onToggleComplete, className, animationDelay }: TaskItemProps) {
+export function TaskItem({ task, onToggleComplete, className, style, animationDelay }: TaskItemProps) {
   const formattedDate = task.dueDate 
     ? new Date(task.dueDate).toLocaleDateString('en-US', { 
         month: 'short', 
@@ -64,6 +65,7 @@ export function TaskItem({ task, onToggleComplete, className, animationDelay }: 
         duration: 0.3, 
         delay: animationDelay ? parseFloat(animationDelay) : 0
       }}
+      style={style}
     >
       <GlassPanel
         variant="card"
