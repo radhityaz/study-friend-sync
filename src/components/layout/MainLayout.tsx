@@ -55,8 +55,8 @@ export function MainLayout({ children, className }: MainLayoutProps) {
             </div>
             
             {isGuestMode && (
-              <Alert variant="warning" className="mb-6 border-yellow-200 bg-yellow-50 text-yellow-800">
-                <AlertCircle className="h-4 w-4 text-yellow-800" />
+              <Alert variant="warning" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   Anda sedang menggunakan Mode Tamu. Untuk menyimpan jadwal dan pengaturan Anda, silakan <a href="/auth" className="font-medium underline">Masuk</a> atau <a href="/auth?tab=register" className="font-medium underline">Daftar</a>.
                 </AlertDescription>
