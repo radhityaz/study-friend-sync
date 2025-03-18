@@ -2,7 +2,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.859d3d98f47943ec92b6f3266442bed5',
+  appId: 'com.jadwalinae.app',
   appName: 'Jadwalinæ',
   webDir: 'dist',
   server: {
