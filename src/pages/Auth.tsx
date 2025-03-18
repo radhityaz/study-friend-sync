@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,6 +15,7 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
   
   // Redirect if user is already logged in
   if (user && !loading) {
@@ -57,6 +58,10 @@ const Auth = () => {
     } catch (error) {
       console.error('Google login error:', error);
     }
+  };
+
+  const handleContinueWithoutLogin = () => {
+    navigate('/', { state: { skipAuth: true } });
   };
   
   return (
@@ -221,6 +226,16 @@ const Auth = () => {
               </Card>
             </TabsContent>
           </Tabs>
+          
+          <div className="mt-6 text-center">
+            <Button 
+              variant="ghost" 
+              className="text-primary hover:text-primary/80"
+              onClick={handleContinueWithoutLogin}
+            >
+              Lanjutkan tanpa login
+            </Button>
+          </div>
         </AnimatedCard>
       </div>
     </div>

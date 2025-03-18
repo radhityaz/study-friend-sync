@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { GlassPanel } from './GlassPanel';
-import { Home, Clipboard, Timer, FileText, Calendar, Settings, Menu, X, LogOut } from 'lucide-react';
+import { Home, Clipboard, Timer, FileText, Calendar, Settings, Menu, X, LogOut, LogIn } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 interface NavItemProps {
@@ -38,11 +38,9 @@ function NavItem({ to, icon, label, active }: NavItemProps) {
 
 export function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { signOut, user } = useAuth();
-  
-  // Don't show navbar if user is not logged in
-  if (!user) return null;
+  const { signOut, user, isGuestMode } = useAuth();
   
   const navItems = [
     { to: '/', icon: <Home size={20} />, label: 'Dashboard' },
@@ -59,6 +57,10 @@ export function Navbar() {
   
   const handleSignOut = () => {
     signOut();
+  };
+
+  const handleSignIn = () => {
+    navigate('/auth');
   };
   
   return (
@@ -90,15 +92,27 @@ export function Navbar() {
               />
             ))}
             
-            <button 
-              onClick={handleSignOut}
-              className="flex items-center p-3 rounded-lg transition-smooth text-red-500 hover:bg-red-50 hover:text-red-600"
-            >
-              <div className="relative mr-3">
-                <LogOut size={20} />
-              </div>
-              <span className="text-sm font-medium">Keluar</span>
-            </button>
+            {isGuestMode ? (
+              <button 
+                onClick={handleSignIn}
+                className="flex items-center p-3 rounded-lg transition-smooth text-blue-500 hover:bg-blue-50 hover:text-blue-600"
+              >
+                <div className="relative mr-3">
+                  <LogIn size={20} />
+                </div>
+                <span className="text-sm font-medium">Masuk</span>
+              </button>
+            ) : (
+              <button 
+                onClick={handleSignOut}
+                className="flex items-center p-3 rounded-lg transition-smooth text-red-500 hover:bg-red-50 hover:text-red-600"
+              >
+                <div className="relative mr-3">
+                  <LogOut size={20} />
+                </div>
+                <span className="text-sm font-medium">Keluar</span>
+              </button>
+            )}
           </div>
         ) : null}
       </GlassPanel>

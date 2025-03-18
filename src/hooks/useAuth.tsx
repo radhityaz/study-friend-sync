@@ -1,8 +1,7 @@
-
 import { useEffect, useState, createContext, useContext, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 
 type AuthContextType = {
@@ -13,6 +12,8 @@ type AuthContextType = {
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  isGuestMode: boolean;
+  setGuestMode: (value: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isGuestMode, setGuestMode] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -126,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       await supabase.auth.signOut();
+      setGuestMode(false);
       navigate('/auth');
       toast({
         title: 'Logout berhasil',
@@ -139,7 +142,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, loading, signIn, signUp, signOut, signInWithGoogle }}>
+    <AuthContext.Provider value={{ 
+      session, 
+      user, 
+      loading, 
+      signIn, 
+      signUp, 
+      signOut, 
+      signInWithGoogle,
+      isGuestMode,
+      setGuestMode
+    }}>
       {children}
     </AuthContext.Provider>
   );
@@ -154,14 +167,20 @@ export function useAuth() {
 }
 
 export function RequireAuth({ children }: { children: ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, isGuestMode, setGuestMode } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   
   useEffect(() => {
-    if (!loading && !user) {
+    // Check if coming from auth page with skipAuth flag
+    if (location.state && location.state.skipAuth) {
+      setGuestMode(true);
+      // Clear the state so refreshing doesn't keep the skipAuth flag
+      window.history.replaceState({}, document.title);
+    } else if (!loading && !user && !isGuestMode) {
       navigate('/auth');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, location, isGuestMode, setGuestMode]);
   
   if (loading) {
     return <div className="flex justify-center items-center h-screen">
@@ -169,5 +188,5 @@ export function RequireAuth({ children }: { children: ReactNode }) {
     </div>;
   }
   
-  return user ? <>{children}</> : null;
+  return (user || isGuestMode) ? <>{children}</> : null;
 }
