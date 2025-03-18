@@ -7,6 +7,8 @@ import { useLocation } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Logo } from '../common/Logo';
 import { useAuth } from '@/hooks/useAuth';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -51,6 +53,15 @@ export function MainLayout({ children, className }: MainLayoutProps) {
                 </div>
               )}
             </div>
+            
+            {isGuestMode && (
+              <Alert variant="warning" className="mb-6 border-yellow-200 bg-yellow-50 text-yellow-800">
+                <AlertCircle className="h-4 w-4 text-yellow-800" />
+                <AlertDescription>
+                  Anda sedang menggunakan Mode Tamu. Untuk menyimpan jadwal dan pengaturan Anda, silakan <a href="/auth" className="font-medium underline">Masuk</a> atau <a href="/auth?tab=register" className="font-medium underline">Daftar</a>.
+                </AlertDescription>
+              </Alert>
+            )}
             
             {children}
             

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { GlassPanel } from './GlassPanel';
-import { Home, Clipboard, Timer, FileText, Calendar, Settings, Menu, X, LogOut, LogIn } from 'lucide-react';
+import { Home, Clipboard, Timer, FileText, Calendar, Settings, Menu, X, LogOut, LogIn, BookOpen } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 interface NavItemProps {
@@ -45,6 +45,7 @@ export function Navbar() {
   const navItems = [
     { to: '/', icon: <Home size={20} />, label: 'Dashboard' },
     { to: '/tasks', icon: <Clipboard size={20} />, label: 'Tasks' },
+    { to: '/study-schedule', icon: <BookOpen size={20} />, label: 'Jadwal Belajar' },
     { to: '/timer', icon: <Timer size={20} />, label: 'Timer' },
     { to: '/notes', icon: <FileText size={20} />, label: 'Notes' },
     { to: '/calendar', icon: <Calendar size={20} />, label: 'Calendar' },
