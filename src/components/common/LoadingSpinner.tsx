@@ -14,7 +14,7 @@ interface LoadingSpinnerProps {
 export function LoadingSpinner({
   fullScreen = false,
   size = 'md',
-  message,
+  message = 'Loading...',
   className
 }: LoadingSpinnerProps) {
   const sizeClasses = {
@@ -25,8 +25,8 @@ export function LoadingSpinner({
   
   const spinnerContent = (
     <div className={cn(
-      "flex items-center justify-center",
-      fullScreen ? "min-h-screen" : "p-4",
+      "flex flex-col items-center justify-center gap-4",
+      fullScreen ? "min-h-screen p-4" : "p-6",
       className
     )}>
       <div className="relative">
@@ -36,13 +36,17 @@ export function LoadingSpinner({
           sizeClasses[size]
         )} />
       </div>
+      
+      {message && (
+        <p className="text-muted-foreground animate-pulse">{message}</p>
+      )}
     </div>
   );
   
   if (fullScreen) {
     return (
       <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-        <GlassPanel variant="panel" intensity="high" className="rounded-full p-2">
+        <GlassPanel variant="panel" intensity="high" className="rounded-lg">
           {spinnerContent}
         </GlassPanel>
       </div>
