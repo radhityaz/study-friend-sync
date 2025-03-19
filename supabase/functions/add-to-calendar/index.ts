@@ -17,13 +17,17 @@ serve(async (req) => {
   }
 
   try {
-    // Placeholder for Google Calendar integration
-    // In a real application, you would:
-    // 1. Get service account credentials from environment variables
-    // 2. Use Google API client to create calendar events
-    // 3. Return success/error responses
+    // Get environment variables
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     
-    // For now, we'll simulate the integration
+    // Check for Google Calendar service account credentials
+    const googleCalendarCredentials = Deno.env.get('GOOGLE_CALENDAR_CREDENTIALS');
+    
+    if (!googleCalendarCredentials) {
+      throw new Error('Missing Google Calendar credentials in environment variables');
+    }
+
     const { scheduleData } = await req.json();
     
     if (!scheduleData || !Array.isArray(scheduleData)) {
@@ -32,7 +36,13 @@ serve(async (req) => {
     
     console.log(`Processing ${scheduleData.length} schedule items for calendar`);
     
-    // Generate fake event IDs
+    // In a real implementation, we would:
+    // 1. Parse the service account credentials from environment variable
+    // 2. Use Google API client to create calendar events
+    // 3. Create events for each item in the scheduleData array
+    // 4. Return created event IDs
+    
+    // For now, we'll simulate the integration with dummy event IDs
     const eventIds = scheduleData.map((_, index) => `event_${Date.now()}_${index}`);
     
     return new Response(
@@ -68,13 +78,21 @@ serve(async (req) => {
 });
 
 /*
- * NOTE: In a production implementation, you would:
+ * NOTE: In a production implementation, we would:
  * 
- * 1. Use the Google APIs client library for JavaScript
- * 2. Set up OAuth2 or service account authentication
- * 3. Call the calendar.events.insert API
- * 4. Handle success/error responses properly
- *
- * This would require proper authentication setup with Google Cloud
- * and environment variables for secrets.
+ * 1. Add the Google APIs client library
+ * 2. Parse the service account credentials JSON from environment variables
+ * 3. Create a Google Calendar API client
+ * 4. For each schedule item:
+ *    - Format the date and time properly (RFC3339)
+ *    - Set timezone to Asia/Jakarta
+ *    - Create the event with proper parameters
+ *    - Handle success/error responses
+ * 
+ * Example implementation would require:
+ * 1. Setting up a Google Cloud Project
+ * 2. Enabling the Google Calendar API
+ * 3. Creating a service account with calendar access
+ * 4. Downloading the credentials file
+ * 5. Adding the credentials JSON as a Supabase secret
  */

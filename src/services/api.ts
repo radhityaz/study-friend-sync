@@ -135,6 +135,8 @@ export class SupabaseAPI {
    * Mendapatkan data mata kuliah pengguna
    */
   public static async getUserCourses(userId: string): Promise<any[]> {
+    // Catatan: Gunakan tipe data yang spesifik bila tabel sudah ada di Supabase
+    // Saat ini kita menggunakan 'any' karena tabel belum didefinisikan
     const { data, error } = await supabase
       .from('user_courses')
       .select('*')
@@ -171,9 +173,9 @@ export class SupabaseAPI {
       .from('user_preferences')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 adalah kode for no rows returned
+    if (error) {
       throw new Error(`Error fetching user preferences: ${error.message}`);
     }
 
@@ -188,9 +190,9 @@ export class SupabaseAPI {
       .from('user_settings')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
-    if (error && error.code !== 'PGRST116') {
+    if (error) {
       throw new Error(`Error fetching user settings: ${error.message}`);
     }
 
