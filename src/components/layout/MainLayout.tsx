@@ -16,7 +16,7 @@ interface MainLayoutProps {
 export function MainLayout({ children, className }: MainLayoutProps) {
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { user } = useAuth();
+  const { user, isGuestMode } = useAuth();
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -42,6 +42,12 @@ export function MainLayout({ children, className }: MainLayoutProps) {
                 <div className="text-sm text-muted-foreground">
                   <span>Masuk sebagai: </span>
                   <span className="font-medium">{user.email}</span>
+                </div>
+              )}
+
+              {isGuestMode && (
+                <div className="text-sm text-muted-foreground">
+                  <span className="font-medium">Mode Tamu</span>
                 </div>
               )}
             </div>

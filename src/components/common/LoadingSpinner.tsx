@@ -25,8 +25,8 @@ export function LoadingSpinner({
   
   const spinnerContent = (
     <div className={cn(
-      "flex items-center justify-center",
-      fullScreen ? "min-h-screen" : "",
+      "flex flex-col items-center justify-center gap-4",
+      fullScreen ? "min-h-screen p-4" : "p-6",
       className
     )}>
       <div className="relative">
@@ -36,6 +36,10 @@ export function LoadingSpinner({
           sizeClasses[size]
         )} />
       </div>
+      
+      {message && (
+        <p className="text-muted-foreground animate-pulse">{message}</p>
+      )}
     </div>
   );
   

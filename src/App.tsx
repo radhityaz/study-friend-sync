@@ -19,7 +19,6 @@ const Timer = lazy(() => import("./pages/Timer"));
 const Notes = lazy(() => import("./pages/Notes"));
 const Calendar = lazy(() => import("./pages/Calendar"));
 const Settings = lazy(() => import("./pages/Settings"));
-const StudySchedule = lazy(() => import("./pages/StudySchedule"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -43,7 +42,6 @@ const App = () => (
                   <Route path="/notes" element={<RequireAuth><Notes /></RequireAuth>} />
                   <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
                   <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
-                  <Route path="/study-schedule" element={<RequireAuth><StudySchedule /></RequireAuth>} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
