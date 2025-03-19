@@ -135,86 +135,68 @@ export class SupabaseAPI {
    * Mendapatkan data mata kuliah pengguna
    */
   public static async getUserCourses(userId: string): Promise<any[]> {
-    try {
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select('*')
-        .eq('user_id', userId);
-        
-      if (error) {
-        throw new Error(`Error fetching user courses: ${error.message}`);
-      }
-      
-      return data || [];
-    } catch (error) {
-      console.error('Error fetching user courses:', error);
-      throw error;
+    // Catatan: Gunakan tipe data yang spesifik bila tabel sudah ada di Supabase
+    // Saat ini kita menggunakan 'any' karena tabel belum didefinisikan
+    const { data, error } = await supabase
+      .from('user_courses')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error) {
+      throw new Error(`Error fetching user courses: ${error.message}`);
     }
+
+    return data || [];
   }
 
   /**
    * Mendapatkan jadwal pengguna
    */
   public static async getUserSchedule(userId: string): Promise<any[]> {
-    try {
-      const { data, error } = await supabase
-        .from('user_schedule')
-        .select('*')
-        .eq('user_id', userId);
-        
-      if (error) {
-        throw new Error(`Error fetching user schedule: ${error.message}`);
-      }
-      
-      return data || [];
-    } catch (error) {
-      console.error('Error fetching user schedule:', error);
-      throw error;
+    const { data, error } = await supabase
+      .from('user_schedule')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error) {
+      throw new Error(`Error fetching user schedule: ${error.message}`);
     }
+
+    return data || [];
   }
 
   /**
    * Mendapatkan preferensi pengguna
    */
   public static async getUserPreferences(userId: string): Promise<any> {
-    try {
-      const { data, error } = await supabase
-        .from('user_preferences')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
-        
-      if (error) {
-        throw new Error(`Error fetching user preferences: ${error.message}`);
-      }
-      
-      return data || {};
-    } catch (error) {
-      console.error('Error fetching user preferences:', error);
-      throw error;
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error fetching user preferences: ${error.message}`);
     }
+
+    return data || {};
   }
 
   /**
    * Mendapatkan pengaturan pengguna
    */
   public static async getUserSettings(userId: string): Promise<any> {
-    try {
-      const { data, error } = await supabase
-        .from('user_settings')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
-        
-      if (error) {
-        throw new Error(`Error fetching user settings: ${error.message}`);
-      }
-      
-      return data || { sks_definition: 50 }; // Default: 1 SKS = 50 menit
-    } catch (error) {
-      console.error('Error fetching user settings:', error);
-      throw error;
+    const { data, error } = await supabase
+      .from('user_settings')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(`Error fetching user settings: ${error.message}`);
     }
+
+    return data || { sks_definition: 50 }; // Default: 1 SKS = 50 menit
   }
 }
 
