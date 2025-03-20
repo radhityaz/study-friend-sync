@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 type GuestModeContextType = {
   isGuestMode: boolean;
@@ -10,7 +10,21 @@ type GuestModeContextType = {
 const GuestModeContext = createContext<GuestModeContextType | undefined>(undefined);
 
 export function GuestModeProvider({ children }: { children: ReactNode }) {
-  const [isGuestMode, setIsGuestMode] = useState(false);
+  // Check if guest mode is enabled in localStorage on initial load
+  const [isGuestMode, setIsGuestMode] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const storedValue = localStorage.getItem('guest-mode');
+      return storedValue === 'true';
+    }
+    return false;
+  });
+
+  // Update localStorage when guest mode changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('guest-mode', isGuestMode ? 'true' : 'false');
+    }
+  }, [isGuestMode]);
 
   const enableGuestMode = () => setIsGuestMode(true);
   const disableGuestMode = () => setIsGuestMode(false);

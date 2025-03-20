@@ -8,13 +8,15 @@ import './styles/responsive.css'
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(registration => {
-        console.log('Service Worker registered: ', registration);
-      })
-      .catch(registrationError => {
-        console.log('Service Worker registration failed: ', registrationError);
-      });
+    import('virtual:pwa-register').then(({ registerSW }) => {
+      registerSW({ immediate: true })
+        .then(res => {
+          console.log('Service Worker registered: ', res);
+        })
+        .catch(error => {
+          console.error('Service Worker registration failed: ', error);
+        });
+    });
   });
 }
 
