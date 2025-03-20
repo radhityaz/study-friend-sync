@@ -1,14 +1,13 @@
 
 import { useEffect, useState, createContext, useContext, ReactNode } from 'react';
-import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { User, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '@/integrations/firebase/client';
+import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { useGuestMode } from './useGuestMode';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 type AuthContextType = {
-  session: Session | null;
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
@@ -20,52 +19,36 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
       setLoading(false);
     });
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
+    return () => unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      
-      if (error) {
-        toast({
-          title: 'Login gagal',
-          description: error.message,
-          variant: 'destructive',
-        });
-        throw error;
-      }
+      await signInWithEmailAndPassword(auth, email, password);
       
       navigate('/');
       toast({
         title: 'Login berhasil',
         description: 'Selamat datang kembali!',
       });
-    } catch (error) {
-      console.error('Error signing in:', error);
+    } catch (error: any) {
+      toast({
+        title: 'Login gagal',
+        description: error.message,
+        variant: 'destructive',
+      });
       throw error;
     } finally {
       setLoading(false);
@@ -75,23 +58,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (email: string, password: string) => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signUp({ email, password });
-      
-      if (error) {
-        toast({
-          title: 'Pendaftaran gagal',
-          description: error.message,
-          variant: 'destructive',
-        });
-        throw error;
-      }
+      await createUserWithEmailAndPassword(auth, email, password);
       
       toast({
         title: 'Pendaftaran berhasil',
-        description: 'Silakan cek email Anda untuk verifikasi.',
+        description: 'Anda telah berhasil mendaftar.',
       });
-    } catch (error) {
-      console.error('Error signing up:', error);
+    } catch (error: any) {
+      toast({
+        title: 'Pendaftaran gagal',
+        description: error.message,
+        variant: 'destructive',
+      });
       throw error;
     } finally {
       setLoading(false);
@@ -101,23 +79,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/auth'
-        }
-      });
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
       
-      if (error) {
-        toast({
-          title: 'Google login gagal',
-          description: error.message,
-          variant: 'destructive',
-        });
-        throw error;
-      }
-    } catch (error) {
-      console.error('Error signing in with Google:', error);
+      navigate('/');
+      toast({
+        title: 'Login berhasil',
+        description: 'Selamat datang!',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Google login gagal',
+        description: error.message,
+        variant: 'destructive',
+      });
       throw error;
     } finally {
       setLoading(false);
@@ -127,13 +102,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     try {
       setLoading(true);
-      await supabase.auth.signOut();
+      await firebaseSignOut(auth);
       navigate('/auth');
       toast({
         title: 'Logout berhasil',
         description: 'Sampai jumpa kembali!',
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error signing out:', error);
     } finally {
       setLoading(false);
@@ -142,7 +117,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ 
-      session, 
       user, 
       loading, 
       signIn, 
