@@ -8,6 +8,7 @@ import { AnimatePresence } from "framer-motion";
 import { Suspense, lazy } from "react";
 import { LoadingSpinner } from "./components/common/LoadingSpinner";
 import { AuthProvider, RequireAuth } from "./hooks/useAuth";
+import { GuestModeProvider } from "./hooks/useGuestMode";
 
 // Add framer-motion for smooth page transitions
 import { MotionConfig } from "framer-motion";
@@ -32,24 +33,26 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AuthProvider>
-            <Suspense fallback={<LoadingSpinner fullScreen size="lg" message="Loading Jadwalinæ..." />}>
-              <AnimatePresence mode="wait">
-                <Routes>
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
-                  <Route path="/tasks" element={<RequireAuth><Tasks /></RequireAuth>} />
-                  <Route path="/timer" element={<RequireAuth><Timer /></RequireAuth>} />
-                  <Route path="/notes" element={<RequireAuth><Notes /></RequireAuth>} />
-                  <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
-                  <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
-                  <Route path="/study-schedule" element={<RequireAuth><StudySchedule /></RequireAuth>} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </AnimatePresence>
-            </Suspense>
-          </AuthProvider>
+          <GuestModeProvider>
+            <AuthProvider>
+              <Suspense fallback={<LoadingSpinner fullScreen size="lg" message="Loading Jadwalinæ..." />}>
+                <AnimatePresence mode="wait">
+                  <Routes>
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
+                    <Route path="/tasks" element={<RequireAuth><Tasks /></RequireAuth>} />
+                    <Route path="/timer" element={<RequireAuth><Timer /></RequireAuth>} />
+                    <Route path="/notes" element={<RequireAuth><Notes /></RequireAuth>} />
+                    <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
+                    <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
+                    <Route path="/study-schedule" element={<RequireAuth><StudySchedule /></RequireAuth>} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AnimatePresence>
+              </Suspense>
+            </AuthProvider>
+          </GuestModeProvider>
         </BrowserRouter>
       </MotionConfig>
     </TooltipProvider>

@@ -3,6 +3,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Logo } from './Logo';
 import { GlassPanel } from './GlassPanel';
+import { Loader2 } from 'lucide-react';
 
 interface LoadingSpinnerProps {
   fullScreen?: boolean;
@@ -25,24 +26,31 @@ export function LoadingSpinner({
   
   const spinnerContent = (
     <div className={cn(
-      "flex items-center justify-center",
+      "flex flex-col items-center justify-center gap-4",
       fullScreen ? "min-h-screen" : "",
       className
     )}>
-      <div className="relative">
-        <Logo size={size} className="opacity-70" withText={false} />
-        <div className={cn(
-          "absolute top-0 left-0 right-0 bottom-0 rounded-full border-t-2 border-primary animate-spin",
-          sizeClasses[size]
-        )} />
-      </div>
+      <Loader2 className={cn(
+        "animate-spin text-primary",
+        {
+          'w-8 h-8': size === 'sm',
+          'w-12 h-12': size === 'md',
+          'w-16 h-16': size === 'lg',
+        }
+      )} />
+      
+      {message && (
+        <div className="text-center text-muted-foreground">
+          {message}
+        </div>
+      )}
     </div>
   );
   
   if (fullScreen) {
     return (
       <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-        <GlassPanel variant="panel" intensity="high" className="rounded-lg">
+        <GlassPanel variant="panel" intensity="high" className="rounded-lg p-8">
           {spinnerContent}
         </GlassPanel>
       </div>

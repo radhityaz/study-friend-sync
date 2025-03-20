@@ -7,6 +7,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { useGuestMode } from '@/hooks/useGuestMode';
 
 /**
  * Kelas untuk mengelola API Gemini
@@ -84,6 +85,12 @@ export class GoogleCalendarAPI {
    */
   public static async addStudySchedule(scheduleData: StudyScheduleItem[]): Promise<string[]> {
     try {
+      // Mock implementation for guest mode
+      if (document.cookie.includes('guest-mode=true')) {
+        console.log('Guest mode detected, simulating calendar API call');
+        return Array(scheduleData.length).fill('').map(() => `mock-event-${Math.random().toString(36).substring(2, 11)}`);
+      }
+      
       // Panggil edge function untuk menambahkan jadwal
       const { data, error } = await supabase.functions.invoke('add-to-calendar', {
         body: { scheduleData }
@@ -110,6 +117,12 @@ export class StudyPlannerAPI {
    */
   public static async generateStudyPlan(userId: string): Promise<StudyScheduleItem[]> {
     try {
+      // Mock implementation for guest mode
+      if (document.cookie.includes('guest-mode=true')) {
+        console.log('Guest mode detected, simulating study plan generation');
+        return this.generateMockStudyPlan();
+      }
+      
       // Panggil edge function untuk membuat jadwal belajar
       const { data, error } = await supabase.functions.invoke('generate-study-plan', {
         body: { userId }
@@ -125,6 +138,40 @@ export class StudyPlannerAPI {
       throw error;
     }
   }
+  
+  // Helper method to generate mock data for guest mode
+  private static generateMockStudyPlan(): StudyScheduleItem[] {
+    const subjects = [
+      'Kalkulus', 'Fisika Dasar', 'Kimia Dasar', 'Algoritma Pemrograman',
+      'Struktur Data', 'Basis Data', 'Jaringan Komputer', 'Sistem Operasi'
+    ];
+    
+    const activities = [
+      'Membaca materi', 'Mengerjakan latihan', 'Review catatan', 
+      'Diskusi kelompok', 'Persiapan ujian', 'Praktikum'
+    ];
+    
+    const mockPlan: StudyScheduleItem[] = [];
+    const today = new Date();
+    
+    for (let i = 0; i < 10; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() + i);
+      
+      const startHour = 8 + Math.floor(Math.random() * 8); // Between 8 AM and 4 PM
+      const endHour = startHour + 1 + Math.floor(Math.random() * 2); // 1-3 hours duration
+      
+      mockPlan.push({
+        tanggal: date.toISOString().split('T')[0],
+        waktu_mulai: `${startHour.toString().padStart(2, '0')}:00`,
+        waktu_berakhir: `${endHour.toString().padStart(2, '0')}:00`,
+        mata_kuliah: subjects[Math.floor(Math.random() * subjects.length)],
+        aktivitas: activities[Math.floor(Math.random() * activities.length)]
+      });
+    }
+    
+    return mockPlan;
+  }
 }
 
 /**
@@ -135,68 +182,147 @@ export class SupabaseAPI {
    * Mendapatkan data mata kuliah pengguna
    */
   public static async getUserCourses(userId: string): Promise<any[]> {
-    // Catatan: Gunakan tipe data yang spesifik bila tabel sudah ada di Supabase
-    // Saat ini kita menggunakan 'any' karena tabel belum didefinisikan
-    const { data, error } = await supabase
-      .from('user_courses')
-      .select('*')
-      .eq('user_id', userId);
-
-    if (error) {
-      throw new Error(`Error fetching user courses: ${error.message}`);
+    // If in guest mode, return mock data
+    if (document.cookie.includes('guest-mode=true')) {
+      return this.getMockUserCourses();
     }
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_courses')
+        .select('*')
+        .eq('user_id', userId);
 
-    return data || [];
+      if (error) {
+        throw new Error(`Error fetching user courses: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching user courses:', error);
+      return [];
+    }
   }
 
   /**
    * Mendapatkan jadwal pengguna
    */
   public static async getUserSchedule(userId: string): Promise<any[]> {
-    const { data, error } = await supabase
-      .from('user_schedule')
-      .select('*')
-      .eq('user_id', userId);
-
-    if (error) {
-      throw new Error(`Error fetching user schedule: ${error.message}`);
+    // If in guest mode, return mock data
+    if (document.cookie.includes('guest-mode=true')) {
+      return this.getMockUserSchedule();
     }
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_schedule')
+        .select('*')
+        .eq('user_id', userId);
 
-    return data || [];
+      if (error) {
+        throw new Error(`Error fetching user schedule: ${error.message}`);
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching user schedule:', error);
+      return [];
+    }
   }
 
   /**
    * Mendapatkan preferensi pengguna
    */
   public static async getUserPreferences(userId: string): Promise<any> {
-    const { data, error } = await supabase
-      .from('user_preferences')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(`Error fetching user preferences: ${error.message}`);
+    // If in guest mode, return mock data
+    if (document.cookie.includes('guest-mode=true')) {
+      return this.getMockUserPreferences();
     }
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
 
-    return data || {};
+      if (error) {
+        throw new Error(`Error fetching user preferences: ${error.message}`);
+      }
+
+      return data || {};
+    } catch (error) {
+      console.error('Error fetching user preferences:', error);
+      return {};
+    }
   }
 
   /**
    * Mendapatkan pengaturan pengguna
    */
   public static async getUserSettings(userId: string): Promise<any> {
-    const { data, error } = await supabase
-      .from('user_settings')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle();
-
-    if (error) {
-      throw new Error(`Error fetching user settings: ${error.message}`);
+    // If in guest mode, return mock data
+    if (document.cookie.includes('guest-mode=true')) {
+      return { sks_definition: 50 }; // Default: 1 SKS = 50 menit
     }
+    
+    try {
+      const { data, error } = await supabase
+        .from('user_settings')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
 
-    return data || { sks_definition: 50 }; // Default: 1 SKS = 50 menit
+      if (error) {
+        throw new Error(`Error fetching user settings: ${error.message}`);
+      }
+
+      return data || { sks_definition: 50 }; // Default: 1 SKS = 50 menit
+    } catch (error) {
+      console.error('Error fetching user settings:', error);
+      return { sks_definition: 50 };
+    }
+  }
+  
+  // Helper methods for mock data in guest mode
+  private static getMockUserCourses(): any[] {
+    return [
+      { id: 1, name: 'Kalkulus', credits: 3, difficulty: 'high' },
+      { id: 2, name: 'Fisika Dasar', credits: 4, difficulty: 'high' },
+      { id: 3, name: 'Pemrograman Dasar', credits: 3, difficulty: 'medium' },
+      { id: 4, name: 'Struktur Data', credits: 3, difficulty: 'medium' },
+      { id: 5, name: 'Algoritma', credits: 3, difficulty: 'high' },
+    ];
+  }
+  
+  private static getMockUserSchedule(): any[] {
+    const today = new Date();
+    const schedule = [];
+    
+    for (let i = 0; i < 5; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() + i);
+      
+      schedule.push({
+        id: i + 1,
+        date: date.toISOString().split('T')[0],
+        course: this.getMockUserCourses()[i].name,
+        start_time: '09:00',
+        end_time: '10:40',
+        is_completed: false
+      });
+    }
+    
+    return schedule;
+  }
+  
+  private static getMockUserPreferences(): any {
+    return {
+      study_time_preference: 'morning',
+      break_duration: 15,
+      session_duration: 45,
+      preferred_study_days: ['monday', 'wednesday', 'friday', 'saturday']
+    };
   }
 }
 

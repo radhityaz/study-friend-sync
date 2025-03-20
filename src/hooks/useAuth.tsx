@@ -4,6 +4,8 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
+import { useGuestMode } from './useGuestMode';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 type AuthContextType = {
   session: Session | null;
@@ -163,19 +165,19 @@ export function useAuth() {
 
 export function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
+  const { isGuestMode } = useGuestMode();
   const navigate = useNavigate();
   
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !user && !isGuestMode) {
       navigate('/auth');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, isGuestMode]);
   
   if (loading) {
-    return <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-    </div>;
+    return <LoadingSpinner fullScreen message="Memuat..." />;
   }
   
-  return user ? <>{children}</> : null;
+  // Allow access if user is logged in OR in guest mode
+  return (user || isGuestMode) ? <>{children}</> : null;
 }

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,12 +9,18 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AnimatedCard } from '@/components/common/AnimatedCard';
 import { Logo } from '@/components/common/Logo';
+import { Eye, EyeOff, UserCircle2 } from 'lucide-react';
+import { useGuestMode } from '@/hooks/useGuestMode';
+import { toast } from '@/components/ui/use-toast';
 
 const Auth = () => {
   const { user, loading, signIn, signUp, signInWithGoogle } = useAuth();
+  const { enableGuestMode } = useGuestMode();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   // Redirect if user is already logged in
   if (user && !loading) {
@@ -23,7 +29,14 @@ const Auth = () => {
   
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!email || !password) {
+      toast({
+        title: "Input tidak lengkap",
+        description: "Harap isi email dan password Anda",
+        variant: "destructive"
+      });
+      return;
+    }
     
     try {
       setIsSubmitting(true);
@@ -37,7 +50,23 @@ const Auth = () => {
   
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) return;
+    if (!email || !password) {
+      toast({
+        title: "Input tidak lengkap",
+        description: "Harap isi email dan password Anda",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (password.length < 6) {
+      toast({
+        title: "Password terlalu pendek",
+        description: "Password harus minimal 6 karakter",
+        variant: "destructive"
+      });
+      return;
+    }
     
     try {
       setIsSubmitting(true);
@@ -59,6 +88,15 @@ const Auth = () => {
     }
   };
   
+  const handleGuestMode = () => {
+    enableGuestMode();
+    navigate('/');
+    toast({
+      title: "Mode tamu aktif",
+      description: "Anda sekarang menggunakan aplikasi dalam mode tamu",
+    });
+  };
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md mx-auto">
@@ -68,6 +106,17 @@ const Auth = () => {
             Aplikasi untuk membantu perencanaan akademik dan manajemen waktu
           </p>
         </div>
+        
+        <AnimatedCard animation="fade" className="opacity-0 animate-fade-in mb-4">
+          <Button
+            onClick={handleGuestMode}
+            variant="outline"
+            className="w-full py-6 flex items-center justify-center gap-2"
+          >
+            <UserCircle2 className="mr-2" />
+            Gunakan Aplikasi Sebagai Tamu
+          </Button>
+        </AnimatedCard>
         
         <AnimatedCard animation="fade" className="opacity-0 animate-fade-in">
           <Tabs defaultValue="login" className="w-full">
@@ -99,13 +148,22 @@ const Auth = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="password">Password</Label>
-                      <Input 
-                        id="password" 
-                        type="password" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
+                      <div className="relative">
+                        <Input 
+                          id="password" 
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                        <button 
+                          type="button"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="relative">
@@ -171,13 +229,22 @@ const Auth = () => {
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="register-password">Password</Label>
-                      <Input 
-                        id="register-password" 
-                        type="password" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
+                      <div className="relative">
+                        <Input 
+                          id="register-password" 
+                          type={showPassword ? "text" : "password"}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                        <button 
+                          type="button"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                      </div>
                       <p className="text-xs text-muted-foreground">
                         Password minimal 6 karakter
                       </p>

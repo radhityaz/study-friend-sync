@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plus, Minus, Save } from 'lucide-react';
+import { Plus, Minus, Save, AlertCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { 
   Select,
@@ -24,17 +24,34 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatedCard } from '@/components/common/AnimatedCard';
+import { toast } from '@/components/ui/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 // Define the form schema with zod
 const formSchema = z.object({
-  totalSKS: z.string().min(1, "Total SKS is required"),
-  completedSKS: z.string().min(1, "Completed SKS is required"),
+  totalSKS: z.string()
+    .min(1, "Total SKS wajib diisi")
+    .refine(val => !isNaN(parseInt(val)), {
+      message: "Total SKS harus berupa angka",
+    })
+    .refine(val => parseInt(val) > 0, {
+      message: "Total SKS harus lebih dari 0",
+    }),
+  completedSKS: z.string()
+    .min(1, "SKS yang telah selesai wajib diisi")
+    .refine(val => !isNaN(parseInt(val)), {
+      message: "SKS yang telah selesai harus berupa angka",
+    })
+    .refine(val => parseInt(val) >= 0, {
+      message: "SKS yang telah selesai tidak boleh negatif",
+    }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 export function SKSInput() {
   const [showForm, setShowForm] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
   
   // Default values
   const defaultValues: FormValues = {
@@ -48,16 +65,37 @@ export function SKSInput() {
   });
   
   const handleSubmit = (values: FormValues) => {
+    // Validate that completedSKS is not greater than totalSKS
+    const total = parseInt(values.totalSKS);
+    const completed = parseInt(values.completedSKS);
+    
+    if (completed > total) {
+      form.setError("completedSKS", {
+        type: "manual",
+        message: "SKS yang telah selesai tidak boleh lebih dari total SKS"
+      });
+      return;
+    }
+    
     // In a real app, save this to the database
     console.log('Saving SKS values:', values);
+    
     // Show a success toast message
+    toast({
+      title: "Informasi SKS disimpan",
+      description: `Total SKS: ${values.totalSKS}, SKS selesai: ${values.completedSKS}`,
+    });
+    
     setShowForm(false);
+    setFormSubmitted(true);
   };
   
   // Calculate completion percentage
   const totalSKS = parseInt(form.watch('totalSKS') || '144');
   const completedSKS = parseInt(form.watch('completedSKS') || '0');
-  const progressPercentage = Math.min(100, Math.round((completedSKS / totalSKS) * 100));
+  const progressPercentage = totalSKS > 0 
+    ? Math.min(100, Math.round((completedSKS / totalSKS) * 100)) 
+    : 0;
   
   return (
     <AnimatedCard
@@ -115,7 +153,7 @@ export function SKSInput() {
               <FormField
                 control={form.control}
                 name="completedSKS"
-                render={({ field }) => (
+                render={({ field, fieldState }) => (
                   <FormItem>
                     <FormLabel>Completed SKS</FormLabel>
                     <div className="flex items-center space-x-2">
@@ -125,7 +163,7 @@ export function SKSInput() {
                         size="icon"
                         className="h-8 w-8"
                         onClick={() => {
-                          const current = parseInt(field.value);
+                          const current = parseInt(field.value) || 0;
                           if (current > 0) {
                             field.onChange((current - 1).toString());
                           }
@@ -136,10 +174,17 @@ export function SKSInput() {
                       <FormControl>
                         <input
                           {...field}
-                          type="number"
-                          min="0"
-                          max={form.watch('totalSKS')}
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
                           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          onChange={(e) => {
+                            // Only allow numeric input or empty string
+                            const value = e.target.value;
+                            if (value === '' || /^[0-9]+$/.test(value)) {
+                              field.onChange(value);
+                            }
+                          }}
                         />
                       </FormControl>
                       <Button
@@ -148,10 +193,16 @@ export function SKSInput() {
                         size="icon"
                         className="h-8 w-8"
                         onClick={() => {
-                          const current = parseInt(field.value);
-                          const max = parseInt(form.watch('totalSKS'));
+                          const current = parseInt(field.value) || 0;
+                          const max = parseInt(form.watch('totalSKS')) || 0;
                           if (current < max) {
                             field.onChange((current + 1).toString());
+                          } else {
+                            toast({
+                              title: "Batas maksimum",
+                              description: "Nilai tidak boleh melebihi Total SKS",
+                              variant: "destructive"
+                            });
                           }
                         }}
                       >
@@ -166,6 +217,16 @@ export function SKSInput() {
                 )}
               />
             </div>
+            
+            {form.formState.errors.totalSKS || form.formState.errors.completedSKS ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                  Mohon perbaiki kesalahan input sebelum menyimpan.
+                </AlertDescription>
+              </Alert>
+            ) : null}
             
             <Button type="submit" className="w-full">
               <Save className="mr-2 h-4 w-4" />
@@ -200,6 +261,12 @@ export function SKSInput() {
                'Congratulations! You have completed all requirements'}
             </p>
           </div>
+          
+          {formSubmitted && (
+            <div className="mt-2 text-center text-xs text-muted-foreground">
+              <p>Data terakhir disimpan</p>
+            </div>
+          )}
         </div>
       )}
     </AnimatedCard>
