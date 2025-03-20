@@ -49,7 +49,7 @@ export function Logo({ size = 'md', className, withText = true }: LogoProps) {
           "font-bold tracking-tight", 
           textSizeClasses[size]
         )}>
-          Jadwalinae
+          Jadwalinæ
         </span>
       )}
     </div>

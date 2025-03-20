@@ -3,7 +3,7 @@
  * API Services
  * 
  * File ini berisi semua konfigurasi dan fungsi untuk mengakses layanan API eksternal
- * yang digunakan dalam aplikasi Jadwalinae.
+ * yang digunakan dalam aplikasi Jadwalin.ae.
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -187,13 +187,11 @@ export class SupabaseAPI {
     }
     
     try {
-      // Use generic typing to bypass schema checking
-      const response = await supabase
-        .from('user_courses')
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
+      const { data, error } = await supabase
+        .from('user_courses' as any)
         .select('*')
         .eq('user_id', userId);
-
-      const { data, error } = response as { data: any[] | null, error: any };
 
       if (error) {
         throw new Error(`Error fetching user courses: ${error.message}`);
@@ -216,13 +214,11 @@ export class SupabaseAPI {
     }
     
     try {
-      // Use generic typing to bypass schema checking
-      const response = await supabase
-        .from('user_schedule')
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
+      const { data, error } = await supabase
+        .from('user_schedule' as any)
         .select('*')
         .eq('user_id', userId);
-
-      const { data, error } = response as { data: any[] | null, error: any };
 
       if (error) {
         throw new Error(`Error fetching user schedule: ${error.message}`);
@@ -245,14 +241,12 @@ export class SupabaseAPI {
     }
     
     try {
-      // Use generic typing to bypass schema checking
-      const response = await supabase
-        .from('user_preferences')
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
+      const { data, error } = await supabase
+        .from('user_preferences' as any)
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
-
-      const { data, error } = response as { data: any | null, error: any };
 
       if (error) {
         throw new Error(`Error fetching user preferences: ${error.message}`);
@@ -275,14 +269,12 @@ export class SupabaseAPI {
     }
     
     try {
-      // Use generic typing to bypass schema checking
-      const response = await supabase
-        .from('user_settings')
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
+      const { data, error } = await supabase
+        .from('user_settings' as any)
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
-
-      const { data, error } = response as { data: any | null, error: any };
 
       if (error) {
         throw new Error(`Error fetching user settings: ${error.message}`);

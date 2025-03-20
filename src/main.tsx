@@ -1,28 +1,27 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
+import App from './App.tsx'
 import './index.css'
-import { BrowserRouter } from 'react-router-dom'
+import './styles/responsive.css'
 
-// Fix for service worker registration
-const registerServiceWorker = async () => {
-  if ('serviceWorker' in navigator) {
-    try {
-      await navigator.serviceWorker.register('/service-worker.js');
-      console.log('Service worker registered successfully');
-    } catch (error) {
-      console.error('Service worker registration failed:', error);
-    }
-  }
-};
-
-registerServiceWorker();
+// Register service worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    import('virtual:pwa-register').then(({ registerSW }) => {
+      registerSW({ immediate: true })
+        .then(res => {
+          console.log('Service Worker registered: ', res);
+        })
+        .catch(error => {
+          console.error('Service Worker registration failed: ', error);
+        });
+    });
+  });
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <App />
   </React.StrictMode>,
 )

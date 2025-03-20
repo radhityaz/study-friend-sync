@@ -1,9 +1,9 @@
 
-# Jadwalinae App - Kotlin Migration Guide
+# Jadwalinæ App - Kotlin Migration Guide
 
 ## Application Overview
 
-Jadwalinae is a study planning and management application for students. It helps users organize their academic schedule, track study time, manage tasks, take notes, and use a pomodoro timer for focused study sessions.
+Jadwalinæ is a study planning and management application for students. It helps users organize their academic schedule, track study time, manage tasks, take notes, and use a pomodoro timer for focused study sessions.
 
 ## Core Features
 
