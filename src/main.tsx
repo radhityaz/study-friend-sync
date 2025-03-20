@@ -5,13 +5,6 @@ import App from './App.tsx'
 import './index.css'
 import './styles/responsive.css'
 
-// Initialize Firebase Analytics
-import { getAnalytics } from 'firebase/analytics';
-import { firebase } from './integrations/firebase/client';
-
-// Initialize Firebase Analytics
-const analytics = getAnalytics(firebase);
-
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {

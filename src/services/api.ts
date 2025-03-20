@@ -3,12 +3,10 @@
  * API Services
  * 
  * File ini berisi semua konfigurasi dan fungsi untuk mengakses layanan API eksternal
- * yang digunakan dalam aplikasi Jadwalinæ.
+ * yang digunakan dalam aplikasi Jadwalin.ae.
  */
 
-import { collection, query, where, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { db, functions } from '@/integrations/firebase/client';
-import { httpsCallable } from 'firebase/functions';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Kelas untuk mengelola API Gemini
@@ -92,11 +90,16 @@ export class GoogleCalendarAPI {
         return Array(scheduleData.length).fill('').map(() => `mock-event-${Math.random().toString(36).substring(2, 11)}`);
       }
       
-      // Call Firebase Cloud Function
-      const addToCalendar = httpsCallable(functions, 'addToCalendar');
-      const result = await addToCalendar({ scheduleData });
-      
-      return (result.data as any).eventIds;
+      // Panggil edge function untuk menambahkan jadwal
+      const { data, error } = await supabase.functions.invoke('add-to-calendar', {
+        body: { scheduleData }
+      });
+
+      if (error) {
+        throw new Error(`Error adding to calendar: ${error.message}`);
+      }
+
+      return data.eventIds;
     } catch (error) {
       console.error('Error adding study schedule to calendar:', error);
       throw error;
@@ -119,11 +122,16 @@ export class StudyPlannerAPI {
         return this.generateMockStudyPlan();
       }
       
-      // Call Firebase Cloud Function
-      const generateStudyPlan = httpsCallable(functions, 'generateStudyPlan');
-      const result = await generateStudyPlan({ userId });
-      
-      return (result.data as any).schedule;
+      // Panggil edge function untuk membuat jadwal belajar
+      const { data, error } = await supabase.functions.invoke('generate-study-plan', {
+        body: { userId }
+      });
+
+      if (error) {
+        throw new Error(`Error generating study plan: ${error.message}`);
+      }
+
+      return data.schedule;
     } catch (error) {
       console.error('Error generating study plan:', error);
       throw error;
@@ -166,9 +174,9 @@ export class StudyPlannerAPI {
 }
 
 /**
- * Kelas untuk mengelola API Firebase
+ * Kelas untuk mengelola API Supabase
  */
-export class FirebaseAPI {
+export class SupabaseAPI {
   /**
    * Mendapatkan data mata kuliah pengguna
    */
@@ -179,16 +187,17 @@ export class FirebaseAPI {
     }
     
     try {
-      const userCoursesRef = collection(db, 'user_courses');
-      const q = query(userCoursesRef, where('user_id', '==', userId));
-      const querySnapshot = await getDocs(q);
-      
-      const courses: any[] = [];
-      querySnapshot.forEach((doc) => {
-        courses.push({ id: doc.id, ...doc.data() });
-      });
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
+      const { data, error } = await supabase
+        .from('user_courses' as any)
+        .select('*')
+        .eq('user_id', userId);
 
-      return courses;
+      if (error) {
+        throw new Error(`Error fetching user courses: ${error.message}`);
+      }
+
+      return data || [];
     } catch (error) {
       console.error('Error fetching user courses:', error);
       return [];
@@ -205,16 +214,17 @@ export class FirebaseAPI {
     }
     
     try {
-      const userScheduleRef = collection(db, 'user_schedule');
-      const q = query(userScheduleRef, where('user_id', '==', userId));
-      const querySnapshot = await getDocs(q);
-      
-      const schedule: any[] = [];
-      querySnapshot.forEach((doc) => {
-        schedule.push({ id: doc.id, ...doc.data() });
-      });
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
+      const { data, error } = await supabase
+        .from('user_schedule' as any)
+        .select('*')
+        .eq('user_id', userId);
 
-      return schedule;
+      if (error) {
+        throw new Error(`Error fetching user schedule: ${error.message}`);
+      }
+
+      return data || [];
     } catch (error) {
       console.error('Error fetching user schedule:', error);
       return [];
@@ -231,14 +241,18 @@ export class FirebaseAPI {
     }
     
     try {
-      const userPreferencesRef = doc(db, 'user_preferences', userId);
-      const docSnap = await getDoc(userPreferencesRef);
-      
-      if (docSnap.exists()) {
-        return docSnap.data();
-      } else {
-        return {};
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
+      const { data, error } = await supabase
+        .from('user_preferences' as any)
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(`Error fetching user preferences: ${error.message}`);
       }
+
+      return data || {};
     } catch (error) {
       console.error('Error fetching user preferences:', error);
       return {};
@@ -255,14 +269,18 @@ export class FirebaseAPI {
     }
     
     try {
-      const userSettingsRef = doc(db, 'user_settings', userId);
-      const docSnap = await getDoc(userSettingsRef);
-      
-      if (docSnap.exists()) {
-        return docSnap.data();
-      } else {
-        return { sks_definition: 50 }; // Default: 1 SKS = 50 menit
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
+      const { data, error } = await supabase
+        .from('user_settings' as any)
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(`Error fetching user settings: ${error.message}`);
       }
+
+      return data || { sks_definition: 50 }; // Default: 1 SKS = 50 menit
     } catch (error) {
       console.error('Error fetching user settings:', error);
       return { sks_definition: 50 };
@@ -326,7 +344,7 @@ export interface StudyScheduleItem {
  * API Services - titik akses utama untuk semua API
  */
 export const APIServices = {
-  Firebase: FirebaseAPI,
+  Supabase: SupabaseAPI,
   Gemini: GeminiAPI,
   GoogleCalendar: GoogleCalendarAPI,
   StudyPlanner: StudyPlannerAPI
