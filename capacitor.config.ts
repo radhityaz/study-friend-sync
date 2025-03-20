@@ -3,7 +3,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.jadwalinae.app',
-  appName: 'Jadwalinæ',
+  appName: 'Jadwalinae',
   webDir: 'dist',
   server: {
     url: 'https://859d3d98-f479-43ec-92b6-f3266442bed5.lovableproject.com?forceHideBadge=true',
