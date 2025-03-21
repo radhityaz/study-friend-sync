@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-import { Suspense, lazy } from "react";
+import { lazy } from "react";
 import { LoadingSpinner } from "./components/common/LoadingSpinner";
 import { AuthProvider, RequireAuth } from "./hooks/useAuth";
 import { GuestModeProvider } from "./hooks/useGuestMode";
@@ -26,6 +26,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
+// Use React 19's Suspense by default
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -35,22 +36,20 @@ const App = () => (
         <BrowserRouter>
           <GuestModeProvider>
             <AuthProvider>
-              <Suspense fallback={<LoadingSpinner fullScreen size="lg" message="Loading Jadwalinæ..." />}>
-                <AnimatePresence mode="wait">
-                  <Routes>
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
-                    <Route path="/tasks" element={<RequireAuth><Tasks /></RequireAuth>} />
-                    <Route path="/timer" element={<RequireAuth><Timer /></RequireAuth>} />
-                    <Route path="/notes" element={<RequireAuth><Notes /></RequireAuth>} />
-                    <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
-                    <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
-                    <Route path="/study-schedule" element={<RequireAuth><StudySchedule /></RequireAuth>} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </AnimatePresence>
-              </Suspense>
+              <AnimatePresence mode="wait">
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
+                  <Route path="/tasks" element={<RequireAuth><Tasks /></RequireAuth>} />
+                  <Route path="/timer" element={<RequireAuth><Timer /></RequireAuth>} />
+                  <Route path="/notes" element={<RequireAuth><Notes /></RequireAuth>} />
+                  <Route path="/calendar" element={<RequireAuth><Calendar /></RequireAuth>} />
+                  <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
+                  <Route path="/study-schedule" element={<RequireAuth><StudySchedule /></RequireAuth>} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </AnimatePresence>
             </AuthProvider>
           </GuestModeProvider>
         </BrowserRouter>
