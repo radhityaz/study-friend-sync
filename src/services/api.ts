@@ -187,7 +187,6 @@ export class SupabaseAPI {
     }
     
     try {
-      // Using a type-safe approach with an explicit return type
       const { data, error } = await supabase
         .from('user_courses')
         .select('*')
@@ -214,7 +213,6 @@ export class SupabaseAPI {
     }
     
     try {
-      // Using a type-safe approach with an explicit return type
       const { data, error } = await supabase
         .from('user_schedule')
         .select('*')
@@ -241,7 +239,6 @@ export class SupabaseAPI {
     }
     
     try {
-      // Using a type-safe approach with an explicit return type
       const { data, error } = await supabase
         .from('user_preferences')
         .select('*')
@@ -269,7 +266,6 @@ export class SupabaseAPI {
     }
     
     try {
-      // Using a type-safe approach with an explicit return type
       const { data, error } = await supabase
         .from('user_settings')
         .select('*')
