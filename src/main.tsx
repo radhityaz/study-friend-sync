@@ -10,8 +10,8 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     import('virtual:pwa-register').then(({ registerSW }) => {
       registerSW({ immediate: true })
-        .then(res => {
-          console.log('Service Worker registered: ', res);
+        .then((registration) => {
+          console.log('Service Worker registered: ', registration);
         })
         .catch(error => {
           console.error('Service Worker registration failed: ', error);
