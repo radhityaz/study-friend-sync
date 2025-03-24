@@ -86,118 +86,86 @@ export function Navbar() {
     }
   };
   
-  if (isMobile) {
-    return (
-      <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex h-full items-center justify-between">
-            {/* Show only the first 4 nav items directly */}
-            {navItems.slice(0, 4).map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex flex-col items-center justify-center flex-1 h-full",
-                  "text-muted-foreground hover:text-foreground transition-colors",
-                  isActive(item.path) && "text-primary"
-                )}
-              >
-                <item.icon className={cn(
-                  "h-5 w-5",
-                  isActive(item.path) ? "text-primary" : "text-muted-foreground"
-                )} />
-                <span className={cn(
-                  "text-xs mt-1",
-                  isActive(item.path) ? "text-primary" : "text-muted-foreground"
-                )}>
-                  {item.name}
-                </span>
-              </Link>
-            ))}
-            
-            {/* Burger menu for the rest */}
-            <Sheet>
-              <SheetTrigger asChild>
-                <button className="flex flex-col items-center justify-center flex-1 h-full text-muted-foreground hover:text-foreground">
-                  <Menu className="h-5 w-5" />
-                  <span className="text-xs mt-1">Menu</span>
-                </button>
-              </SheetTrigger>
-              <SheetContent side="right">
-                <SheetHeader className="mb-6">
-                  <SheetTitle>Menu</SheetTitle>
-                </SheetHeader>
-                <div className="flex flex-col gap-2">
-                  {navItems.slice(4).map((item) => (
-                    <SheetClose asChild key={item.path}>
-                      <Link
-                        to={item.path}
-                        className={cn(
-                          "flex items-center p-3 rounded-md",
-                          isActive(item.path) 
-                            ? "bg-primary/10 text-primary" 
-                            : "text-foreground hover:bg-accent"
-                        )}
-                      >
-                        <item.icon className="h-5 w-5 mr-3" />
-                        {item.name}
-                      </Link>
-                    </SheetClose>
-                  ))}
-                  
-                  <div className="h-px bg-border my-4" />
-                  
-                  <div className="px-3 py-2 text-sm text-muted-foreground">
-                    {isGuestMode ? (
-                      "Mode Tamu Aktif"
-                    ) : (
-                      <>Masuk sebagai: {user?.email}</>
-                    )}
-                  </div>
-                  
-                  <Button
-                    variant="outline"
-                    className="mt-2 w-full justify-start"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    {isGuestMode ? "Keluar dari Mode Tamu" : "Logout"}
-                  </Button>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
+  // Burger menu untuk semua ukuran layar
   return (
     <div className="fixed bottom-0 left-0 z-50 w-full h-16 bg-background border-t">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex h-full items-center justify-between">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full",
-                "text-muted-foreground hover:text-foreground transition-colors",
-                isActive(item.path) && "text-primary"
-              )}
-            >
-              <item.icon className={cn(
-                "h-6 w-6",
-                isActive(item.path) ? "text-primary" : "text-muted-foreground"
-              )} />
-              <span className={cn(
-                "text-xs mt-1",
-                isActive(item.path) ? "text-primary" : "text-primary/80"
-              )}>
-                {item.name}
-              </span>
-            </Link>
-          ))}
+          {/* Menampilkan hanya ikon Beranda di bagian kiri */}
+          <Link
+            to="/"
+            className={cn(
+              "flex flex-col items-center justify-center h-full px-4",
+              "text-muted-foreground hover:text-foreground transition-colors",
+              isActive('/') && "text-primary"
+            )}
+          >
+            <HomeIcon className={cn(
+              "h-6 w-6",
+              isActive('/') ? "text-primary" : "text-muted-foreground"
+            )} />
+            <span className={cn(
+              "text-xs mt-1",
+              isActive('/') ? "text-primary" : "text-primary/80"
+            )}>
+              Beranda
+            </span>
+          </Link>
+          
+          {/* Space filler untuk tengah */}
+          <div className="flex-1"></div>
+          
+          {/* Burger menu untuk semua item */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="flex flex-col items-center justify-center h-full px-4 text-muted-foreground hover:text-foreground">
+                <Menu className="h-6 w-6" />
+                <span className="text-xs mt-1">Menu</span>
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[80%] sm:w-[350px]">
+              <SheetHeader className="mb-6">
+                <SheetTitle>Menu Navigasi</SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-2">
+                {navItems.map((item) => (
+                  <SheetClose asChild key={item.path}>
+                    <Link
+                      to={item.path}
+                      className={cn(
+                        "flex items-center p-3 rounded-md",
+                        isActive(item.path) 
+                          ? "bg-primary/10 text-primary" 
+                          : "text-foreground hover:bg-accent"
+                      )}
+                    >
+                      <item.icon className="h-5 w-5 mr-3" />
+                      {item.name}
+                    </Link>
+                  </SheetClose>
+                ))}
+                
+                <div className="h-px bg-border my-4" />
+                
+                <div className="px-3 py-2 text-sm text-muted-foreground">
+                  {isGuestMode ? (
+                    "Mode Tamu Aktif"
+                  ) : (
+                    <>Masuk sebagai: {user?.email}</>
+                  )}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  className="mt-2 w-full justify-start"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  {isGuestMode ? "Keluar dari Mode Tamu" : "Logout"}
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </div>
