@@ -187,8 +187,9 @@ export class SupabaseAPI {
     }
     
     try {
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
       const { data, error } = await supabase
-        .from('user_courses')
+        .from('user_courses' as any)
         .select('*')
         .eq('user_id', userId);
 
@@ -213,8 +214,9 @@ export class SupabaseAPI {
     }
     
     try {
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
       const { data, error } = await supabase
-        .from('user_schedule')
+        .from('user_schedule' as any)
         .select('*')
         .eq('user_id', userId);
 
@@ -239,8 +241,9 @@ export class SupabaseAPI {
     }
     
     try {
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
       const { data, error } = await supabase
-        .from('user_preferences')
+        .from('user_preferences' as any)
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
@@ -266,8 +269,9 @@ export class SupabaseAPI {
     }
     
     try {
+      // Note: Using any to avoid TypeScript errors with Supabase tables not in schema
       const { data, error } = await supabase
-        .from('user_settings')
+        .from('user_settings' as any)
         .select('*')
         .eq('user_id', userId)
         .maybeSingle();
